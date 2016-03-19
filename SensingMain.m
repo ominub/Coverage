@@ -10,7 +10,8 @@ phi=zeros(length(x),length(y));
 % M=zeros(5,1);
 % L=zeros(5,2);
 % C=zeros(5,2);
-%% set robot initial condition
+
+% set robot initial condition
 Robot1_position=[0.5 0.8];
 Robot2_position=[0.6 0.4];
 R_p1=0.1;
@@ -18,7 +19,8 @@ Robots=Robot1_position;
 SensingR=R_p1;
 phi_robot=zeros(length(x),length(y));
 Kappa=1;%vehicle velocity
-%% set environment static obstacle
+
+% set environment static obstacle
 
 Obstacle1_position=[0.3 0.55];
 Obstacle2_position=[0.4 0.7];
@@ -27,7 +29,7 @@ Obstacle4_position=[0.45 0.5];
 ObstaclesPoint=[Obstacle1_position;Obstacle2_position;Obstacle3_position;Obstacle4_position];
 
 
-%% Density Function Design
+% Density Function Design
 
 for i=1:length(x)
     for j=1:length(y)
@@ -35,14 +37,18 @@ for i=1:length(x)
          Y(i,j)=(j-1)*0.001;
          q=[x(i) y(j)];
          phi_en(i,j)=(exp(-norm(q-p_en)^2/(2*0.12^2))+0.01);
-         phi_robot(i,j)=exp(-(norm(q-Robots)-SensingR/2)^4/(2*0.02^4));
+         if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
+              phi_robot(i,j)=1;
+         else 
+              phi_robot(i,j)=0;
+         end
          phi(i,j)=phi_en(i,j)*phi_robot(i,j);
         
      end
 end
-phi=phi/phi_robot(round(Robots(1)*1000+1),round(Robots(2)*1000+1));
+% phi=phi/phi_robot(round(Robots(1)*1000+1),round(Robots(2)*1000+1));
 
-%% Voronoi Diagram
+% Voronoi Diagram
 
 t = 0:0.1:2*pi;
 X_hm =Robots(1,1)+SensingR(1)*cos(t);
@@ -56,12 +62,14 @@ plot(X_hm,Y_hm,'c');hold on
 plot(p_en(1),p_en(2),'bx');
 axis([0 1 0 1])
 
-%% show density function
+% show density function
 % figure
-% surf(X,Y,phi,'LineStyle','none');
+% surf(X,Y,phi_robot,'LineStyle','none');
 % title('f_{en}')
 %  axis([0 1 0 1])
 %  view([0 0 1])
+
+%% Controller
 
 for xs=1:1:120
 %% 決定要計算的部分
@@ -128,16 +136,20 @@ for i=1:length(x)
          X(i,j)=(i-1)*0.001;
          Y(i,j)=(j-1)*0.001;
          q=[x(i) y(j)];
-
-         phi_robot(i,j)=exp(-(norm(q-Robots)-SensingR/2)^4/(2*0.02^4));
+        if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
+              phi_robot(i,j)=1;
+         else 
+              phi_robot(i,j)=0;
+        end
           phi(i,j)=phi_en(i,j)*phi_robot(i,j);
 %          if phi(i,j)<0.012%%%%%%%%%%%%%
 %         phi(i,j)=0;%%%%%%%%%%%%%%%%%%%%%
 %          end%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      end
 end
-phi=phi/phi_robot(round(Robots(1)*1000+1),round(Robots(2)*1000+1));
+% phi=phi/phi_robot(round(Robots(1)*1000+1),round(Robots(2)*1000+1));
 
+%Threshold
 for i=1:length(x)
     for j=1:length(y)
        if phi(i,j)<phi(round(Robots(1)*1000+1),round(Robots(2)*1000+1))%%%%%%%%%%%%%%%%
