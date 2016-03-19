@@ -1,2 +1,2 @@
 # Coverage
-One robot in the button hierarchical control to go to goal and avoid obstacle
+One robot in the button of hierarchical control to go to goal and avoid obstacle
