@@ -17,7 +17,7 @@ R_p1=0.1;
 Robots=Robot1_position;
 SensingR=R_p1;
 phi_robot=zeros(length(x),length(y));
-Kappa=0.01;%vehicle velocity
+Kappa=1;%vehicle velocity
 %% set environment static obstacle
 
 Obstacle1_position=[0.3 0.55];

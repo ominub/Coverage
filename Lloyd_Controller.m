@@ -1,7 +1,7 @@
 L=[0 0];
 M=0;
 robot=0;
-Partition=SensedObjectsNum;%和障礙物之間的距離比例
+Partition=1;%和障礙物之間的距離比例
 for r=0:0.01:SensingR %
     for theta=0:0.01:2*pi
         i=round(1000*(Robots(1,1)+r*cos(theta)))+1;
@@ -17,6 +17,6 @@ for r=0:0.01:SensingR %
     end    
 end
 C=L/M;
-     Robots=Robots+Kappa*(C-Robots)/norm(C-Robots);%畫出Voronoi後往那個方向前進Kappa
+     Robots=Robots+Kappa*(C-Robots);%畫出Voronoi後往那個方向前進Kappa
     
 
