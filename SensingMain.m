@@ -18,7 +18,7 @@ R_p1=0.1;
 Robots=Robot1_position;
 SensingR=R_p1;
 phi_robot=zeros(length(x),length(y));
-Kappa=1;%vehicle velocity
+Kappa=2;%vehicle velocity
 
 % set environment static obstacle
 
@@ -38,7 +38,7 @@ for i=1:length(x)
          q=[x(i) y(j)];
          phi_en(i,j)=(exp(-norm(q-p_en)^2/(2*0.12^2))+0.01);
          if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
-              phi_robot(i,j)=1;
+               phi_robot(i,j)=1-8/SensingR*abs(norm(q-Robots)-3/8*SensingR);
          else 
               phi_robot(i,j)=0;
          end
@@ -64,7 +64,7 @@ axis([0 1 0 1])
 
 % show density function
 % figure
-% surf(X,Y,phi_robot,'LineStyle','none');
+% surf(X,Y,phi,'LineStyle','none');
 % title('f_{en}')
 %  axis([0 1 0 1])
 %  view([0 0 1])
@@ -136,11 +136,11 @@ for i=1:length(x)
          X(i,j)=(i-1)*0.001;
          Y(i,j)=(j-1)*0.001;
          q=[x(i) y(j)];
-        if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
-              phi_robot(i,j)=1;
+         if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
+              phi_robot(i,j)=1-8/SensingR*abs(norm(q-Robots)-3/8*SensingR);
          else 
               phi_robot(i,j)=0;
-        end
+         end
           phi(i,j)=phi_en(i,j)*phi_robot(i,j);
 %          if phi(i,j)<0.012%%%%%%%%%%%%%
 %         phi(i,j)=0;%%%%%%%%%%%%%%%%%%%%%

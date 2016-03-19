@@ -7,7 +7,7 @@ ss=3;
 for tt=1:120
         handles=waitbar(tt/(361));
         fname=sprintf('%d.jpg',tt);
-        filename=['C:\Users\ominub\Desktop\Coverage\Sensing\',fname];
+        filename=['D:\Coverage\Single-Robot\',fname];
         im=imread(filename);
         writeVideo(writerObj,im);
 end
