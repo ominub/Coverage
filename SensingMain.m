@@ -18,15 +18,21 @@ R_p1=0.1;
 Robots=Robot1_position;
 SensingR=R_p1;
 phi_robot=zeros(length(x),length(y));
-Kappa=2;%vehicle velocity
+Kappa=5;%vehicle velocity
 
 % set environment static obstacle
 
-Obstacle1_position=[0.3 0.55];
-Obstacle2_position=[0.4 0.7];
-Obstacle3_position=[0.3 0.5];
-Obstacle4_position=[0.45 0.5];
-ObstaclesPoint=[Obstacle1_position;Obstacle2_position;Obstacle3_position;Obstacle4_position];
+Obstacle1_position=[0.3 0.4];
+Obstacle2_position=[0.3 0.5];
+Obstacle3_position=[0.3 0.6];
+Obstacle4_position=[0.3 0.8];
+Obstacle5_position=[0.4 0.7];
+Obstacle6_position=[0.5 0.7];
+Obstacle7_position=[0.6 0.7];
+Obstacle8_position=[0.2 0.7];
+Obstacle9_position=[0.2 0.6];
+Obstacle10_position=[0.1 0.6];
+ObstaclesPoint=[Obstacle1_position;Obstacle2_position;Obstacle3_position;Obstacle4_position;Obstacle5_position;Obstacle6_position;Obstacle7_position;Obstacle8_position;Obstacle9_position;Obstacle10_position];
 
 
 % Density Function Design
@@ -37,11 +43,12 @@ for i=1:length(x)
          Y(i,j)=(j-1)*0.001;
          q=[x(i) y(j)];
          phi_en(i,j)=(exp(-norm(q-p_en)^2/(2*0.12^2))+0.01);
-         if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
-               phi_robot(i,j)=1-8/SensingR*abs(norm(q-Robots)-3/8*SensingR);
-         else 
-              phi_robot(i,j)=0;
-         end
+%          if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
+         phi_robot(i,j)=exp(-(norm(q-Robots)-SensingR*3/8)^4/(2*(SensingR/8/2)^4));
+%                phi_robot(i,j)=1-8/SensingR*abs(norm(q-Robots)-3/8*SensingR);
+%          else 
+%               phi_robot(i,j)=0;
+%          end
          phi(i,j)=phi_en(i,j)*phi_robot(i,j);
         
      end
@@ -50,30 +57,29 @@ end
 
 % Voronoi Diagram
 
-t = 0:0.1:2*pi;
-X_hm =Robots(1,1)+SensingR(1)*cos(t);
-Y_hm =Robots(1,2)+SensingR(1)*sin(t);
-
-
-plot(Robots(:,1),Robots(:,2),'c*');hold on
-
-plot(ObstaclesPoint(:,1),ObstaclesPoint(:,2),'ro');hold on
-plot(X_hm,Y_hm,'c');hold on
-plot(p_en(1),p_en(2),'bx');
-axis([0 1 0 1])
+% t = 0:0.1:2*pi;
+% X_hm =Robots(1,1)+SensingR(1)*cos(t);
+% Y_hm =Robots(1,2)+SensingR(1)*sin(t);
+% 
+% plot(Robots(:,1),Robots(:,2),'c*');hold on
+% 
+% plot(ObstaclesPoint(:,1),ObstaclesPoint(:,2),'ro');hold on
+% plot(X_hm,Y_hm,'c');hold on
+% plot(p_en(1),p_en(2),'bx');
+% axis([0 1 0 1])
 
 % show density function
-% figure
-% surf(X,Y,phi,'LineStyle','none');
-% title('f_{en}')
-%  axis([0 1 0 1])
-%  view([0 0 1])
+figure
+surf(X,Y,phi,'LineStyle','none');
+title('f_{en}')
+ axis([0 1 0 1])
+ view([0 0 1])
 
 %% Controller
 
 for xs=1:1:120
-%% 決定要計算的部分
-
+% 決定要計算的部分
+%      Robots=Robots+Kappa*(C-Robots)/norm(C-Robots);%畫出Voronoi後往那個方向前進Kappa
 SensedObjects=10*ones(length(ObstaclesPoint),2);
 SensedObjectsNum=0;
 for i=1:1:length(ObstaclesPoint)
@@ -84,7 +90,7 @@ end
 end
 % Lloyd_Controller_func(SensedObjects)
 if SensedObjectsNum>0%若有感測到障礙物則畫Voronoi
-%% Lloyd
+% Lloyd
 L=[0 0];
 M=0;
 robot=0;
@@ -94,8 +100,12 @@ for r=0:0.01:SensingR %
         i=round(1000*(Robots(1,1)+r*cos(theta)))+1;
         j=round(1000*(Robots(1,2)+r*sin(theta)))+1;
         q=[x(i) y(j)];
-     for k=1: SensedObjectsNum  %感測範圍內的障礙物畫出Voronoi         
+     for k=1: SensedObjectsNum  %感測範圍內的障礙物畫出Voronoi      
+      
         [maxDistance,robot]=min([norm(q-Robots(1,:)),Partition*norm(q-SensedObjects(k,:))]);
+        if robot>1
+            break
+        end
      end
     if robot==1 %畫分在機器人Voronoi區域的拿來計算Voronoi質心位置
      M=M+phi(i,j);
@@ -126,21 +136,17 @@ C=L/M;
 %   Robots=Robots+Kappa*(p_en-Robots)/norm(p_en-Robots);%沒感測到就直接往目標位置移動
 %   C=Robots;
 end
-%% Patrol Position Update
+% Patrol Position Update
 % ObstaclesPoint(4,1)=ObstaclesPoint(4,1)-0.01*(heaviside(xs)-2*heaviside(xs-10)+2*heaviside(xs-20)-2*heaviside(xs-30)+2*heaviside(xs-40));
 
-%% Density Function Redesign
+% Density Function Redesign
 
 for i=1:length(x)
     for j=1:length(y)
          X(i,j)=(i-1)*0.001;
          Y(i,j)=(j-1)*0.001;
          q=[x(i) y(j)];
-         if norm(q-Robots)<0.5*SensingR && norm(q-Robots)>0.25*SensingR
-              phi_robot(i,j)=1-8/SensingR*abs(norm(q-Robots)-3/8*SensingR);
-         else 
-              phi_robot(i,j)=0;
-         end
+    phi_robot(i,j)=exp(-(norm(q-Robots)-SensingR*3/8)^4/(2*(SensingR/8/2)^4));
           phi(i,j)=phi_en(i,j)*phi_robot(i,j);
 %          if phi(i,j)<0.012%%%%%%%%%%%%%
 %         phi(i,j)=0;%%%%%%%%%%%%%%%%%%%%%
@@ -150,16 +156,16 @@ end
 % phi=phi/phi_robot(round(Robots(1)*1000+1),round(Robots(2)*1000+1));
 
 %Threshold
-for i=1:length(x)
-    for j=1:length(y)
-       if phi(i,j)<phi(round(Robots(1)*1000+1),round(Robots(2)*1000+1))%%%%%%%%%%%%%%%%
-        phi(i,j)=0;%%%%%%%%%%%%%%%%%%%%%
-       end%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    end
-end
+% for i=1:length(x)
+%     for j=1:length(y)
+%        if phi(i,j)<phi(round(Robots(1)*1000+1),round(Robots(2)*1000+1))%%%%%%%%%%%%%%%%
+%         phi(i,j)=0;%%%%%%%%%%%%%%%%%%%%%
+%        end%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     end
+% end
 
 
-%% plot
+% plot
 figure
 t = 0:0.1:2*pi;
 %Voronoi質心位置
@@ -185,7 +191,7 @@ axis([0 1 0 1])
 %  axis([0 1 0 1])
 %  view([0 0 1])
 
-%% Save Pic
+% Save Pic
 picname=sprintf('%d.jpg',xs);
 saveas(gcf,picname);
  end 

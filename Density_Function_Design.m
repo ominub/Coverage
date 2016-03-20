@@ -28,8 +28,8 @@ plot(p_en(1),p_en(2),'bx');
 axis([0 1 0 1])
 
 %% show density function
-% figure
-% surf(X,Y,phi,'LineStyle','none');
-% title('f_{en}')
-%  axis([0 1 0 1])
-%  view([0 0 1])
+figure
+surf(X,Y,phi,'LineStyle','none');
+title('f_{en}')
+ axis([0 1 0 1])
+ view([0 0 1])
