@@ -4,7 +4,7 @@ x=0:0.001:1;
 y=0:0.001:1;
 X=zeros(length(x),length(y));
 Y=zeros(length(x),length(y));
-p_en=[0.2 0.4];
+p_en=[0.2 0.5];
 phi_en=zeros(length(x),length(y));
 phi=zeros(length(x),length(y));
 % M=zeros(5,1);
@@ -18,7 +18,7 @@ R_p1=0.1;
 Robots=Robot1_position;
 SensingR=R_p1;
 phi_robot=zeros(length(x),length(y));
-Kappa=5;%vehicle velocity
+Kappa=randn;%vehicle velocity
 
 % set environment static obstacle
 
@@ -57,23 +57,23 @@ end
 
 % Voronoi Diagram
 
-% t = 0:0.1:2*pi;
-% X_hm =Robots(1,1)+SensingR(1)*cos(t);
-% Y_hm =Robots(1,2)+SensingR(1)*sin(t);
-% 
-% plot(Robots(:,1),Robots(:,2),'c*');hold on
-% 
-% plot(ObstaclesPoint(:,1),ObstaclesPoint(:,2),'ro');hold on
-% plot(X_hm,Y_hm,'c');hold on
-% plot(p_en(1),p_en(2),'bx');
-% axis([0 1 0 1])
+t = 0:0.1:2*pi;
+X_hm =Robots(1,1)+SensingR(1)*cos(t);
+Y_hm =Robots(1,2)+SensingR(1)*sin(t);
+
+plot(Robots(:,1),Robots(:,2),'c*');hold on
+
+plot(ObstaclesPoint(:,1),ObstaclesPoint(:,2),'ro');hold on
+plot(X_hm,Y_hm,'c');hold on
+plot(p_en(1),p_en(2),'bx');
+axis([0 1 0 1])
 
 % show density function
-figure
-surf(X,Y,phi,'LineStyle','none');
-title('f_{en}')
- axis([0 1 0 1])
- view([0 0 1])
+% figure
+% surf(X,Y,phi,'LineStyle','none');
+% title('f_{en}')
+%  axis([0 1 0 1])
+%  view([0 0 1])
 
 %% Controller
 
