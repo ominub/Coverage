@@ -4,7 +4,7 @@ writerObj.Quality=100;
 writeObj.CompressionRatio=40;
 open(writerObj);
 ss=3;
-for tt=1:70
+for tt=1:100
         handles=waitbar(tt/(361));
         fname=sprintf('%d.jpg',tt);
         filename=['D:\Coverage\Single-Robot\',fname];
